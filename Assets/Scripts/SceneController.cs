@@ -11,7 +11,7 @@ public class SceneController : MonoBehaviour
 
 	private GameObject scene;
 	private float floorWaitTime;
-	private float cloudWaitTime = 1.2f;
+	private float cloudWaitTime = 3f;
 	private bool rolling = true;
 
 	void Start ()
@@ -41,7 +41,7 @@ public class SceneController : MonoBehaviour
 		while (true)
 		{
 			var cloud = Instantiate(cloudPrefab, scene.transform);
-			cloudPrefab.transform.position = new Vector2(4, Random.Range(0f, 0.8f));
+			cloudPrefab.transform.position = new Vector2(4, Random.Range(0f, 2f));
 			yield return new WaitForSeconds(cloudWaitTime);
 		}
 	}
@@ -57,5 +57,10 @@ public class SceneController : MonoBehaviour
 	{
 		if(rolling)
 			transform.position += Vector3.left * rollSpeed * Time.deltaTime;
+
+		if (GameInput.stop) {
+			rollSpeed = 0;
+			Debug.Log ("I pressed but.");
+		}
 	}
 }

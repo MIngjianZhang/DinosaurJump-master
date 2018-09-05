@@ -13,8 +13,12 @@ public static class GameInput
 	
     public static bool Jump
     {
-        get { return Input.GetAxis("Jump") > 0 || Input.touchCount > 0; }
+		get { return Input.GetMouseButtonDown(0)|| Input.touchCount > 0; }
     }
+
+	public static bool stop{
+		get { return Input.GetMouseButtonDown (1); }
+	}
 }
 
 public class GameController : MonoBehaviour
@@ -58,7 +62,6 @@ public class GameController : MonoBehaviour
 		playerController = FindObjectOfType<PlayerController>();
 		sceneController = FindObjectOfType<SceneController>();
 		cactusCreator = FindObjectOfType<CactusCreator>();
-
 		scoreManager = FindObjectOfType<ScoreManager>();
 		scoreManager.StartScoring();
 
@@ -92,7 +95,7 @@ public class GameController : MonoBehaviour
 
 	public void Restart()
 	{
-		SceneManager.LoadScene(1);
+		SceneManager.LoadScene(0);
 	}
 
 	internal void MMGotNewClient(int connectionID,string ipadddress)
