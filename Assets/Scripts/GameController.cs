@@ -7,17 +7,16 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 
-
 public static class GameInput
 {
-	
+	//public string name { get; set;}
     public static bool Jump
     {
-		get { return Input.GetMouseButtonDown(0)|| Input.touchCount > 0; }
+		get { return Input.GetMouseButtonDown(0);}
     }
 
 	public static bool stop{
-		get { return Input.GetMouseButtonDown (1); }
+		get { return Input.GetMouseButtonDown(1); }
 	}
 }
 
@@ -35,6 +34,8 @@ public class GameController : MonoBehaviour
 	public static GameController Instance{ get { return pThis;}}
 	public Text EMG1Text;
 	public Text EMG2Text;
+	public Text Jumptext;
+	public Text StopText;
 	internal UDPDiscovery udp = new UDPDiscovery ();
 	internal DataReaderForUnity.DataReader readme = new DataReaderForUnity.DataReader ();
 	internal DataReaderForUnity.DataValues datavalues = new DataReaderForUnity.DataValues ();
@@ -45,7 +46,16 @@ public class GameController : MonoBehaviour
 	static double EMG2Total =0;
 	static double EMG1Avg = 0;
 	static double EMG2Avg = 0;
+	public double EMG1MVC = 0.0002275;
+	public double EMG2MVC = 0.0055815;
 	int counter = 0;
+	int i =1;
+	int j =1;
+
+	public static bool Jump;
+	//{get { return Input.GetMouseButtonDown(0);}}
+	public static bool stop;
+	//{get { return Input.GetMouseButtonDown(1);}}
 
 	public GameController(){
 		pThis = this;
@@ -59,12 +69,14 @@ public class GameController : MonoBehaviour
 		mmServer.AddVariableChangedNotification("HandPos", UpdateHandPos);
 		mmServer.Start ();
 
+		StartCoroutine (Wait1sec1 ());
+		StartCoroutine (Wait1sec2 ());
+
 		playerController = FindObjectOfType<PlayerController>();
 		sceneController = FindObjectOfType<SceneController>();
 		cactusCreator = FindObjectOfType<CactusCreator>();
 		scoreManager = FindObjectOfType<ScoreManager>();
 		scoreManager.StartScoring();
-
 		gameoverUI = GameObject.Find("GameoverUI");
 		gameoverUI.SetActive(false);
 
@@ -79,9 +91,43 @@ public class GameController : MonoBehaviour
 		EMG1Avg = EMG1Total/(double)counter;
 		EMG2Total = Math.Abs (PubEMG2) + EMG2Total;
 		EMG2Avg = EMG2Total/(double)counter;
-        if(Die && GameInput.Jump)
-            Restart();
     }
+		
+	IEnumerator Wait1sec1(){
+		while (true) {
+			Debug.Log ("In the wait1sec2 loop");
+			//Jump = false;
+			yield return new WaitForSeconds (1);
+			if (PubEMG1 > (0.5*EMG1MVC)) {
+				stop = true;
+				Debug.Log ("I have been here");
+				StopText.text = ("Stopped ") + j;
+			}
+			j++;
+			yield return new WaitForSeconds (0.1f);
+			stop = false;
+		}
+	}
+
+	IEnumerator Wait1sec2(){
+		while (true) {
+			Debug.Log ("In the wait1sec2 loop");
+			//Jump = false;
+			yield return new WaitForSeconds (1);
+			if (PubEMG2 > (0.5*EMG2MVC)) {
+				Jump = true;
+				Debug.Log ("I have been here");
+				Jumptext.text = ("Jumped ") + i;
+			}
+			i++;
+			yield return new WaitForSeconds (0.1f);
+			Jump = false;
+		}
+	}
+
+	/*IEnumerator goback(){
+		yield return new WaitForSeconds (0.5);
+	}*/
 
     public void PlayerDie()
     {
@@ -109,7 +155,7 @@ public class GameController : MonoBehaviour
 		double EMG1 = (double)data;
 		if (EMG1Text != null)
 			EMG1Text.text = EMG1.ToString("0.00000000");
-		PubEMG1 = EMG1;
+		PubEMG1 = Math.Abs(EMG1);
 	}
 
 	internal void UpdateEMG2(string varname,object data)
@@ -119,7 +165,7 @@ public class GameController : MonoBehaviour
 		double EMG2 = (double)data;
 		if (EMG2Text != null)
 			EMG2Text.text = EMG2.ToString("0.00000000");
-		PubEMG2 = EMG2;
+		PubEMG2 = Math.Abs(EMG2);
 		}
 
 

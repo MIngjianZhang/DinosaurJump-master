@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour {
 	private Rigidbody2D rigidbody;
 	private Animator animator;
     private bool isAlive = true;
+	private bool collided = false;
 
     private float JumpVelocity
 	{
@@ -36,23 +37,49 @@ public class PlayerController : MonoBehaviour {
 		rigidbody.velocity = Vector2.up * JumpVelocity;
 	}
 
+	void Stop(){
+		
+	}
+
 	public void Die()
 	{
-		animator.SetTrigger("Die");
+		//animator.SetTrigger("Die");
 		isAlive = false;
 		rigidbody.isKinematic = true;
 		rigidbody.velocity = Vector2.zero;
+	}
+
+	private void OnTriggerEnter2D(Collider2D other)
+	{
+		collided = true;
+
+		if (other.CompareTag("Player"))
+		{
+			FindObjectOfType<SceneController>().StopRolling();
+			if (collided && GameController.Jump) {
+				Debug.Log ("Player This should be the place");
+				FindObjectOfType<SceneController>().resumeRolling();
+			}
+		}
+
+		if (collided && GameController.Jump) {
+			Debug.Log ("Player Or This should be the place");
+			FindObjectOfType<SceneController>().resumeRolling();
+		}
+
+		collided = false;
 	}
 
 	void Update ()
 	{
 		if (isAlive)
 		{
-			if (GameInput.Jump && !IsJumping)
+			if (GameController.Jump && !IsJumping)
 			{
 				Jump();
+				Debug.Log ("I jumped///");
 			}
-			else if(!GameInput.Jump && IsJumping)
+			else if(!GameController.Jump && IsJumping)
 			{
 				rigidbody.gravityScale = gScale0;
 			}

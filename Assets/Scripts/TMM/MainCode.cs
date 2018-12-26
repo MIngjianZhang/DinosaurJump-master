@@ -72,15 +72,10 @@ public class MainCode : MonoBehaviour
 
 	IEnumerator Spawn(){
 		while(keeponworkingguys){
-			HandPosText.text = "I ";
 		//spawnpoints = GameObject.FindGameObjectsWithTag ("Sphere");
-			HandPosText.text = "want ";
 		int index = Random.Range (0, spawnpoints.Length);
-			HandPosText.text = "to" + index;
 		currentpoint = spawnpoints [index];
-			HandPosText.text = "see" + index;
 		Instantiate (currentpoint);
-			HandPosText.text = "wchich " + index;
 		// start the timer of EMG1 and EMG2
 			if (index == 0) {
 				img1.enabled = true;

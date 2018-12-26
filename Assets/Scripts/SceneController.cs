@@ -53,13 +53,24 @@ public class SceneController : MonoBehaviour
 		StopCoroutine("CreateFloor");
 	}
 
+	public void resumeRolling(){
+		rolling = true;
+		StartCoroutine("CreateFloor");
+		StartCoroutine("CreateCloud");
+	}
+
 	void FixedUpdate ()
 	{
 		if(rolling)
 			transform.position += Vector3.left * rollSpeed * Time.deltaTime;
-
-		if (GameInput.stop) {
-			rollSpeed = 0;
+		
+		if (GameController.Jump) {
+			resumeRolling ();
+			Time.timeScale = 1;
+			Debug.Log ("I pressed butsss.");
+		}
+		if (GameController.stop) {
+			Time.timeScale = 0.5f;
 			Debug.Log ("I pressed but.");
 		}
 	}
